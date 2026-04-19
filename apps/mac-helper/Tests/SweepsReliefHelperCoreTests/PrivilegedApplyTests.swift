@@ -70,3 +70,79 @@ func privilegedHostsValidationRejectsInvalidHostname() {
     #expect(reason != nil)
     #expect(reason!.contains("invalid hostname"))
 }
+
+// MARK: - /etc/hosts managed section merge (no real disk I/O)
+
+@Test
+func mergeEmptyEtcHostsProducesWrappedBlock() {
+    let inner = "0.0.0.0\tx.example\n"
+    guard case let .success(merged) = PrivilegedEtcHostsMerge.mergeManagedSection(intoExisting: "", managedInnerContent: inner) else {
+        Issue.record("expected success")
+        return
+    }
+    #expect(merged.contains(PrivilegedEtcHostsMerge.beginMarker))
+    #expect(merged.contains(PrivilegedEtcHostsMerge.endMarker))
+    #expect(merged.contains("0.0.0.0\tx.example"))
+}
+
+@Test
+func mergeAppendsWhenNoMarkers() {
+    let existing = "127.0.0.1\tlocalhost\n"
+    let inner = "0.0.0.0\tb.com\n"
+    guard case let .success(merged) = PrivilegedEtcHostsMerge.mergeManagedSection(intoExisting: existing, managedInnerContent: inner) else {
+        Issue.record("expected success")
+        return
+    }
+    #expect(merged.hasPrefix("127.0.0.1\tlocalhost"))
+    #expect(merged.contains(PrivilegedEtcHostsMerge.beginMarker))
+    #expect(merged.contains("0.0.0.0\tb.com"))
+}
+
+@Test
+func mergeReplacesManagedSectionPreservesUserLines() {
+    let innerV1 = "0.0.0.0\ta.example\n"
+    let innerV2 = "0.0.0.0\tb.example\n"
+    guard case let .success(first) = PrivilegedEtcHostsMerge.mergeManagedSection(
+        intoExisting: "10.0.0.1\tpinned.local\n",
+        managedInnerContent: innerV1
+    ) else {
+        Issue.record("expected success")
+        return
+    }
+    #expect(first.contains("pinned.local"))
+    #expect(first.contains("a.example"))
+
+    guard case let .success(second) = PrivilegedEtcHostsMerge.mergeManagedSection(intoExisting: first, managedInnerContent: innerV2) else {
+        Issue.record("expected success")
+        return
+    }
+    #expect(second.contains("pinned.local"))
+    #expect(second.contains("b.example"))
+    #expect(!second.contains("a.example"))
+}
+
+@Test
+func mergeOrphanBeginFails() {
+    let bad =
+        """
+        \(PrivilegedEtcHostsMerge.beginMarker)
+        127.0.0.1\twoops
+        """
+    let r = PrivilegedEtcHostsMerge.mergeManagedSection(intoExisting: bad, managedInnerContent: "0.0.0.0\tx.com\n")
+    guard case let .failure(err) = r else {
+        Issue.record("expected failure")
+        return
+    }
+    #expect(err == .orphanBeginMarker)
+}
+
+@Test
+func mergeOrphanEndFails() {
+    let bad = "127.0.0.1\tl\n\(PrivilegedEtcHostsMerge.endMarker)\n"
+    let r = PrivilegedEtcHostsMerge.mergeManagedSection(intoExisting: bad, managedInnerContent: "0.0.0.0\tx.com\n")
+    guard case let .failure(err) = r else {
+        Issue.record("expected failure")
+        return
+    }
+    #expect(err == .orphanEndMarker)
+}

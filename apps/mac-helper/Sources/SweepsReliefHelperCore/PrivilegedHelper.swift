@@ -280,10 +280,39 @@ public final class PrivilegedHelper: NSObject, PrivilegedHelperProtocol, NSXPCLi
             return
         }
 
-        // Write to /etc/hosts atomically
+        let existingEtcHosts: String
+        if FileManager.default.fileExists(atPath: PrivilegedHelper.etcHostsPath) {
+            do {
+                existingEtcHosts = try String(contentsOfFile: PrivilegedHelper.etcHostsPath, encoding: .utf8)
+            } catch {
+                log("ERROR: Failed to read /etc/hosts: \(error)")
+                reply(false, "Failed to read /etc/hosts: \(error.localizedDescription)", nil)
+                return
+            }
+        } else {
+            existingEtcHosts = ""
+        }
+
+        let merged: String
+        switch PrivilegedEtcHostsMerge.mergeManagedSection(intoExisting: existingEtcHosts, managedInnerContent: hostsContent) {
+        case .success(let s):
+            merged = s
+        case .failure(let err):
+            switch err {
+            case .orphanBeginMarker:
+                log("ERROR: /etc/hosts has \(PrivilegedEtcHostsMerge.beginMarker) without matching \(PrivilegedEtcHostsMerge.endMarker)")
+                reply(false, "Managed section is incomplete in /etc/hosts (orphan begin marker); fix manually and retry", nil)
+            case .orphanEndMarker:
+                log("ERROR: /etc/hosts has orphan \(PrivilegedEtcHostsMerge.endMarker)")
+                reply(false, "Managed section markers are inconsistent in /etc/hosts (orphan end marker); fix manually and retry", nil)
+            }
+            return
+        }
+
+        // Write merged /etc/hosts atomically (only the managed section may change; see PrivilegedEtcHostsMerge).
         let tempPath = "\(PrivilegedHelper.etcHostsPath).tmp.\(ProcessInfo.processInfo.processIdentifier)"
         do {
-            try hostsContent.write(toFile: tempPath, atomically: false, encoding: .utf8)
+            try merged.write(toFile: tempPath, atomically: false, encoding: .utf8)
 
             // Set proper ownership (root:wheel) and permissions (644)
             try FileManager.default.setAttributes([
@@ -295,8 +324,8 @@ public final class PrivilegedHelper: NSObject, PrivilegedHelperProtocol, NSXPCLi
             // Atomic rename
             try FileManager.default.moveItem(atPath: tempPath, toPath: PrivilegedHelper.etcHostsPath)
 
-            log("Successfully applied hosts to \(PrivilegedHelper.etcHostsPath)")
-            reply(true, "Successfully applied to /etc/hosts", backupPath)
+            log("Successfully merged managed section into \(PrivilegedHelper.etcHostsPath)")
+            reply(true, "Successfully merged SweepsRelief managed section in /etc/hosts", backupPath)
         } catch {
             // Clean up temp file if it exists
             try? FileManager.default.removeItem(atPath: tempPath)
