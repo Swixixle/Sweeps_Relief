@@ -26,6 +26,7 @@ ENV/
 # Keys / secrets (never commit)
 *.pem
 *.key
+keys/
 **/secrets/
 .env
 .env.*
