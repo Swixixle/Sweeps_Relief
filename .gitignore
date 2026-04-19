@@ -50,3 +50,7 @@ htmlcov/
 # Generated local artifacts (keep published/ in git for samples only if desired)
 data/candidates/local/
 *.local.json
+
+# Signed runtime policy artifacts (publish via Releases or another channel; keep policy.content.json tracked)
+data/published/policy.json
+data/published/*.sig
