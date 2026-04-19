@@ -1,0 +1,4 @@
+.build/
+.swiftpm/
+validation-state/
+validation-test/config.local.json

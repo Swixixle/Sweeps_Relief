@@ -1,0 +1,10 @@
+{
+  "policy_url": "https://example.invalid/policy.json",
+  "public_key_path": "/Users/you/Library/Application Support/SweepsRelief/public.pem",
+  "state_dir": "/Users/you/Library/Application Support/SweepsRelief",
+  "hosts_output_path": "/Users/you/Library/Application Support/SweepsRelief/generated_hosts",
+  "applied_hash_path": "/Users/you/Library/Application Support/SweepsRelief/applied_policy_hash.txt",
+  "event_log_path": "/Users/you/Library/Application Support/SweepsRelief/events.jsonl",
+  "refresh_interval_seconds": 900,
+  "strict_mode": true
+}

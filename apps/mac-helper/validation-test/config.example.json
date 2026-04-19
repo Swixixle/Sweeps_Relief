@@ -1,0 +1,10 @@
+{
+  "policy_url": "http://127.0.0.1:8000/policy.json",
+  "public_key_path": "REPO_ROOT/keys/public.pem",
+  "state_dir": "REPO_ROOT/apps/mac-helper/validation-state",
+  "hosts_output_path": "REPO_ROOT/apps/mac-helper/validation-state/generated_hosts",
+  "applied_hash_path": "REPO_ROOT/apps/mac-helper/validation-state/applied_policy_hash.txt",
+  "event_log_path": "REPO_ROOT/apps/mac-helper/validation-state/events.jsonl",
+  "refresh_interval_seconds": 900,
+  "strict_mode": true
+}
