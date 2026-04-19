@@ -13,7 +13,7 @@ public enum Runner {
         case driftDetected
     }
 
-    public static func runOnce(config: ResolvedAppConfig) async throws {
+    public static func runOnce(config: ResolvedAppConfig, applyMode: ApplyMode = .dryRun) async throws {
         let deviceId = try DeviceIdentity.deviceId(file: config.deviceIdURL)
         let pem = try String(contentsOf: config.publicKeyURL, encoding: .utf8)
 
@@ -87,20 +87,40 @@ public enum Runner {
             throw error
         }
 
+        let applyResult: ApplyResult
         do {
-            _ = try PolicyApplier.applyDryRun(hosts: hosts, to: config.hostsOutputURL)
+            applyResult = try await PolicyApplier.apply(
+                hosts: hosts,
+                mode: applyMode,
+                to: config.hostsOutputURL,
+                expectedDigest: Hashing.sha256Hex(Data(hosts.utf8))
+            )
         } catch {
             try EventLogger.appendLine(
                 logURL: config.eventLogURL,
                 deviceId: deviceId,
                 type: "apply_failed",
-                context: ["phase": "write_hosts", "error": String(describing: error)]
+                context: ["phase": "write_hosts", "mode": applyModeLabel(applyMode), "error": String(describing: error)]
             )
             try PolicyStateStore.writeLastRun(
                 PolicyStateStore.LastRun(ts: isoNow(), outcome: Outcome.applyFailed.rawValue),
                 to: config.lastRunURL
             )
             throw error
+        }
+
+        // Log privileged apply details if used
+        if applyResult.usedPrivilegedPath {
+            var context: [String: Any] = ["mode": "privileged"]
+            if let backupPath = applyResult.backupPath {
+                context["backup_path"] = backupPath
+            }
+            try EventLogger.appendLine(
+                logURL: config.eventLogURL,
+                deviceId: deviceId,
+                type: "privileged_apply_succeeded",
+                context: context
+            )
         }
 
         try PolicyStateStore.writeAppliedHash(contentHash, to: config.appliedHashURL)
@@ -147,5 +167,13 @@ public enum Runner {
         let f = ISO8601DateFormatter()
         f.formatOptions = [.withInternetDateTime]
         return f.string(from: Date())
+    }
+
+    private static func applyModeLabel(_ mode: ApplyMode) -> String {
+        switch mode {
+        case .dryRun: return "dry_run"
+        case .privilegedWithFallback: return "privileged_with_fallback"
+        case .privilegedRequired: return "privileged_required"
+        }
     }
 }

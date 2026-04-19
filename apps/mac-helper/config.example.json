@@ -6,5 +6,6 @@
   "applied_hash_path": "/Users/you/Library/Application Support/SweepsRelief/applied_policy_hash.txt",
   "event_log_path": "/Users/you/Library/Application Support/SweepsRelief/events.jsonl",
   "refresh_interval_seconds": 900,
-  "strict_mode": true
+  "strict_mode": true,
+  "apply_mode": "dry_run"
 }

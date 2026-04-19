@@ -10,6 +10,7 @@ public struct AppConfig: Codable, Sendable {
     public var eventLogPath: String
     public var refreshIntervalSeconds: Int
     public var strictMode: Bool
+    public var applyMode: String?
     public var appliedVersionPath: String?
     public var policyCachePath: String?
     public var lastRunPath: String?
@@ -24,6 +25,7 @@ public struct AppConfig: Codable, Sendable {
         case eventLogPath = "event_log_path"
         case refreshIntervalSeconds = "refresh_interval_seconds"
         case strictMode = "strict_mode"
+        case applyMode = "apply_mode"
         case appliedVersionPath = "applied_version_path"
         case policyCachePath = "policy_cache_path"
         case lastRunPath = "last_run_path"
@@ -39,6 +41,7 @@ public struct AppConfig: Codable, Sendable {
         eventLogPath: String,
         refreshIntervalSeconds: Int = 900,
         strictMode: Bool = true,
+        applyMode: String? = nil,
         appliedVersionPath: String? = nil,
         policyCachePath: String? = nil,
         lastRunPath: String? = nil,
@@ -52,6 +55,7 @@ public struct AppConfig: Codable, Sendable {
         self.eventLogPath = eventLogPath
         self.refreshIntervalSeconds = refreshIntervalSeconds
         self.strictMode = strictMode
+        self.applyMode = applyMode
         self.appliedVersionPath = appliedVersionPath
         self.policyCachePath = policyCachePath
         self.lastRunPath = lastRunPath
@@ -101,4 +105,16 @@ public struct ResolvedAppConfig: Sendable {
     public let policyCacheURL: URL
     public let lastRunURL: URL
     public let deviceIdURL: URL
+
+    /// Returns the apply mode based on configuration (default: dryRun).
+    public var applyMode: ApplyMode {
+        switch raw.applyMode?.lowercased() {
+        case "privileged_required":
+            return .privilegedRequired
+        case "privileged_with_fallback", "privileged":
+            return .privilegedWithFallback
+        default:
+            return .dryRun
+        }
+    }
 }
