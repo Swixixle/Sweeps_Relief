@@ -69,4 +69,16 @@ public enum EventLogger {
         }
         return s
     }
+
+    /// Move existing JSONL aside so the next event starts a new chain (`prev_hash` empty). Use after bad runs contaminated the log.
+    public static func archiveEventLogIfPresent(at logURL: URL) throws -> URL? {
+        guard FileManager.default.fileExists(atPath: logURL.path) else { return nil }
+        let dir = logURL.deletingLastPathComponent()
+        var stamp = ISO8601DateFormatter().string(from: Date())
+        stamp = stamp.replacingOccurrences(of: ":", with: "-")
+        let name = logURL.lastPathComponent
+        let dest = dir.appendingPathComponent("\(name).archive-\(stamp)")
+        try FileManager.default.moveItem(at: logURL, to: dest)
+        return dest
+    }
 }

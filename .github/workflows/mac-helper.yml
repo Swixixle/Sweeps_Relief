@@ -1,0 +1,23 @@
+# Swift mac-helper: verifier parity with Python artifacts is the main cryptographic trust seam.
+name: mac-helper
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - "apps/mac-helper/**"
+      - ".github/workflows/mac-helper.yml"
+  pull_request:
+    paths:
+      - "apps/mac-helper/**"
+      - ".github/workflows/mac-helper.yml"
+
+jobs:
+  swift-test:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: SwiftPM tests
+        run: |
+          cd apps/mac-helper
+          swift test

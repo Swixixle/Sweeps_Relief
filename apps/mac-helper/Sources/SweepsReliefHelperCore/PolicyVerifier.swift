@@ -1,6 +1,7 @@
 import Crypto
 import Foundation
 
+/// Must agree with Python `policy_body_for_signing` + `hash` / Ed25519 on the same `policy.json` bytes. Covered by `policyJsonHashMatchesArtifactField`.
 public enum PolicyVerifierError: Error {
     case invalidJSON
     case missingPolicyField

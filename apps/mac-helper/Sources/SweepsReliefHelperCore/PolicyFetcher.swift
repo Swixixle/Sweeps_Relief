@@ -1,5 +1,7 @@
 import Foundation
 
+/// Policy fetch must not use shared URLSession disk/memory caches: a mutable `policy.json` at the same URL must always re-fetch.
+/// Stale cache bytes caused false hash mismatches vs on-disk/Python-verified policy after local file restore (strict validation 2026-04).
 public enum PolicyFetcherError: Error {
     case httpStatus(Int)
     case emptyBody

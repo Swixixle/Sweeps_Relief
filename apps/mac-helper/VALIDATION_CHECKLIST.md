@@ -144,6 +144,18 @@ Restore `policy.json` from git or re-run section 1 before continuing.
 
 ---
 
+## 6.5 Ledger hygiene (after false runs or tooling fixes)
+
+If `events.jsonl` contains **spurious** `policy_verification_failed` / `hashMismatch` lines from an older helper (e.g. URL cache or PEM parsing bugs), archive before new evidence:
+
+| Step | Command | P/F |
+|------|---------|-----|
+| L.1 | `.build/release/SweepsReliefMacHelper archive-event-log --config /path/to/config.json` | |
+
+**Expected:** Current `events.jsonl` is **renamed** to `events.jsonl.archive-<timestamp>` in the same directory. The next `run-once` starts a **new** chain (first event uses empty `prev_hash`). Does **not** delete history — archives it for segregation.
+
+---
+
 ## 7. Technical inspection (manual)
 
 | Question | Notes | P/F |

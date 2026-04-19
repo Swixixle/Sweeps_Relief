@@ -13,6 +13,7 @@ struct SweepsReliefCLI: AsyncParsableCommand {
             RenderHosts.self,
             CheckTamper.self,
             PrintState.self,
+            ArchiveEventLog.self,
         ]
     )
 }
@@ -128,6 +129,22 @@ struct PrintState: AsyncParsableCommand {
            let s = String(data: lr, encoding: .utf8)
         {
             print("last_run: \(s)")
+        }
+    }
+}
+
+struct ArchiveEventLog: AsyncParsableCommand {
+    static let configuration = CommandConfiguration(commandName: "archive-event-log")
+
+    @Option(name: .long, help: "Path to config.json")
+    var config: String
+
+    func run() throws {
+        let cfg = try AppConfig.load(from: URL(fileURLWithPath: config)).resolved()
+        if let dest = try EventLogger.archiveEventLogIfPresent(at: cfg.eventLogURL) {
+            print("Archived event log to: \(dest.path)")
+        } else {
+            print("No event log at \(cfg.eventLogURL.path); nothing to archive.")
         }
     }
 }
