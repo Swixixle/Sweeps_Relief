@@ -1,7 +1,7 @@
 import Foundation
 
 /// Errors that can occur during privileged operations.
-public enum PrivilegedHelperError: Error, Sendable {
+public enum PrivilegedHelperError: Error, Sendable, Equatable {
     case connectionFailed
     case communicationTimeout
     case invalidDigest
@@ -274,11 +274,9 @@ public final class PrivilegedHelper: NSObject, PrivilegedHelperProtocol, NSXPCLi
             }
         }
 
-        // Validate hosts content format (basic safety checks)
-        let validationResult = validateHostsContent(hostsContent)
-        guard validationResult.isValid else {
-            log("ERROR: Hosts content validation failed: \(validationResult.error ?? "unknown")")
-            reply(false, "Hosts content validation failed: \(validationResult.error ?? "unknown")", nil)
+        if let reason = PrivilegedHostsLineValidation.validationReason(for: hostsContent) {
+            log("ERROR: Hosts content validation failed: \(reason)")
+            reply(false, "Hosts content validation failed: \(reason)", nil)
             return
         }
 
@@ -329,75 +327,6 @@ public final class PrivilegedHelper: NSObject, PrivilegedHelperProtocol, NSXPCLi
     }
 
     // MARK: - Private
-
-    private struct ValidationResult {
-        let isValid: Bool
-        let error: String?
-    }
-
-    private func validateHostsContent(_ content: String) -> ValidationResult {
-        let lines = content.split(separator: "\n", omittingEmptySubsequences: false)
-
-        for (index, line) in lines.enumerated() {
-            let trimmed = line.trimmingCharacters(in: .whitespaces)
-
-            // Skip empty lines and comments
-            if trimmed.isEmpty || trimmed.hasPrefix("#") {
-                continue
-            }
-
-            // Validate hosts file format: IP_address hostname [alias...]
-            let components = trimmed.split(separator: " ", omittingEmptySubsequences: true)
-            guard components.count >= 2 else {
-                return ValidationResult(isValid: false, error: "Line \(index + 1) has invalid format: '\(trimmed)'")
-            }
-
-            // Validate IP address (basic check)
-            let ip = String(components[0])
-            guard isValidIP(ip) else {
-                return ValidationResult(isValid: false, error: "Line \(index + 1) has invalid IP: '\(ip)'")
-            }
-
-            // Validate hostnames
-            for i in 1..<components.count {
-                let hostname = String(components[i])
-                guard isValidHostname(hostname) else {
-                    return ValidationResult(isValid: false, error: "Line \(index + 1) has invalid hostname: '\(hostname)'")
-                }
-            }
-        }
-
-        return ValidationResult(isValid: true, error: nil)
-    }
-
-    private func isValidIP(_ ip: String) -> Bool {
-        // Accept 0.0.0.0, 127.0.0.1, ::1
-        let validIPs = ["0.0.0.0", "127.0.0.1", "::1", "::ffff:127.0.0.1"]
-        if validIPs.contains(ip) {
-            return true
-        }
-
-        // Basic IPv4 validation
-        let parts = ip.split(separator: ".")
-        guard parts.count == 4 else { return false }
-        for part in parts {
-            guard let num = Int(part), num >= 0 && num <= 255 else { return false }
-        }
-        return true
-    }
-
-    private func isValidHostname(_ hostname: String) -> Bool {
-        // Basic hostname validation
-        // Must not be empty, must not contain spaces, must not start/end with dots
-        guard !hostname.isEmpty else { return false }
-        guard !hostname.contains(" ") else { return false }
-        guard !hostname.hasPrefix(".") else { return false }
-        guard !hostname.hasSuffix(".") else { return false }
-
-        // Only allow alphanumeric, hyphens, and dots
-        let allowed = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "-."))
-        return hostname.unicodeScalars.allSatisfy { allowed.contains($0) }
-    }
 
     private func log(_ message: String) {
         let timestamp = ISO8601DateFormatter().string(from: Date())
