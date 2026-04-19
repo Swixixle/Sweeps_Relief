@@ -10,6 +10,8 @@ struct SweepsReliefCLI: AsyncParsableCommand {
             RunOnce.self,
             InstallLaunchAgent.self,
             UninstallLaunchAgent.self,
+            InstallPrivilegedHelper.self,
+            PrivilegedHelperStatus.self,
             RenderHosts.self,
             CheckTamper.self,
             PrintState.self,
@@ -24,9 +26,29 @@ struct RunOnce: AsyncParsableCommand {
     @Option(name: .long, help: "Path to config.json")
     var config: String
 
+    @Option(name: .long, help: "Apply mode: dry_run, privileged, privileged_required")
+    var applyMode: String?
+
     func run() async throws {
         let cfg = try AppConfig.load(from: URL(fileURLWithPath: config))
-        try await Runner.runOnce(config: cfg.resolved())
+        let resolved = cfg.resolved()
+
+        // Determine apply mode: CLI flag > config > default
+        let mode: ApplyMode
+        if let modeStr = applyMode?.lowercased() ?? cfg.applyMode?.lowercased() {
+            switch modeStr {
+            case "privileged_required":
+                mode = .privilegedRequired
+            case "privileged", "privileged_with_fallback":
+                mode = .privilegedWithFallback
+            default:
+                mode = .dryRun
+            }
+        } else {
+            mode = .dryRun
+        }
+
+        try await Runner.runOnce(config: resolved, applyMode: mode)
     }
 }
 
@@ -60,6 +82,56 @@ struct UninstallLaunchAgent: AsyncParsableCommand {
 
     func run() throws {
         try LaunchAgentInstaller.uninstall()
+    }
+}
+
+struct InstallPrivilegedHelper: AsyncParsableCommand {
+    static let configuration = CommandConfiguration(commandName: "install-privileged-helper")
+
+    func run() throws {
+        if PrivilegedHelperInstaller.isInstalled() {
+            print("Privileged helper is already installed at \(PrivilegedHelperInstaller.helperPath)")
+            return
+        }
+
+        print("Privileged helper installation requires user authentication.")
+        print("NOTE: This is a placeholder. Full SMJobBless implementation requires:")
+        print("  1. Signed helper binary with Team ID")
+        print("  2. LaunchServices plist in /Library/LaunchDaemons")
+        print("  3. Proper entitlements and Info.plist")
+        print("")
+        print("For testing, manually install the helper:")
+        print("  sudo cp .build/release/SweepsReliefPrivilegedHelper \(PrivilegedHelperInstaller.helperPath)")
+        print("  sudo chmod 4755 \(PrivilegedHelperInstaller.helperPath)")
+
+        let installed = try PrivilegedHelperInstaller.install()
+        if installed {
+            print("Privileged helper is installed.")
+        } else {
+            print("Privileged helper installation requires additional setup (see above).")
+        }
+    }
+}
+
+struct PrivilegedHelperStatus: AsyncParsableCommand {
+    static let configuration = CommandConfiguration(commandName: "privileged-helper-status")
+
+    func run() async throws {
+        let installed = PrivilegedHelperInstaller.isInstalled()
+        print("Installed: \(installed)")
+        if installed {
+            print("Path: \(PrivilegedHelperInstaller.helperPath)")
+
+            let client = PrivilegedHelperClient.shared
+            let available = await client.isHelperAvailable()
+            print("Responsive: \(available)")
+
+            if available {
+                if let version = await client.getVersion() {
+                    print("Version: \(version)")
+                }
+            }
+        }
     }
 }
 
