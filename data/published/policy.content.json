@@ -1,0 +1,48 @@
+{
+  "affiliate_domains": [],
+  "domain_patterns": [],
+  "domains": [
+    "example-operator.test",
+    "example-review-funnel.test"
+  ],
+  "funnel_domains": [
+    "example-affiliate.test"
+  ],
+  "generated_at": "2026-01-01T00:00:00Z",
+  "heuristics": {
+    "keywords": [
+      "gold coins",
+      "social casino",
+      "sweeps",
+      "sweepstakes casino"
+    ],
+    "keyword_weights": {
+      "sweeps": 1.0,
+      "sweepstakes casino": 1.5
+    },
+    "page_indicators": [
+      "redeem",
+      "sweepstakes"
+    ],
+    "title_indicators": [
+      "free coins"
+    ]
+  },
+  "metadata": {
+    "note": "Sample unsigned policy body. Sign with sweeps-relief sign-policy using a local private key."
+  },
+  "payment_indicators": [
+    "cashier",
+    "checkout",
+    "deposit"
+  ],
+  "schema_version": "1.0",
+  "sources": [
+    {
+      "name": "seed-import",
+      "retrieved_at": null,
+      "url": null
+    }
+  ],
+  "version": "0.1.0-sample"
+}

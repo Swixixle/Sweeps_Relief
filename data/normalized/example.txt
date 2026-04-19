@@ -1,0 +1,3 @@
+# Example normalized seed list (one domain per line)
+example-operator.test
+https://example-review-funnel.test/path
