@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Sweeps Relief Guard</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        margin: 12px;
+        min-width: 220px;
+      }
+      label {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      .count {
+        font-size: 14px;
+        color: #333;
+        margin-bottom: 8px;
+      }
+      button {
+        margin-top: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <label>
+      <input type="checkbox" id="enabled" checked />
+      Enabled
+    </label>
+    <div class="count">Recent blocks (session store): <strong id="block-count">0</strong></div>
+    <button type="button" id="open-options">Options</button>
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Wallet — verify identity &amp; redeem</title>
+  </head>
+  <body>
+    <section>
+      <h2>Cashier &amp; billing</h2>
+      <p>
+        Deposit bonus wallet redeem sweeps coins gold coins verify identity KYC billing address
+        no purchase necessary promotions cashier
+      </p>
+      <form action="/api/wallet/deposit" method="post">
+        <h3>Verify identity</h3>
+        <label for="wallet-email">Billing email for redemption</label>
+        <input
+          type="email"
+          id="wallet-email"
+          name="billing_email"
+          class="kyc-field wallet-input"
+          placeholder="Email for billing and wallet"
+          autocomplete="email"
+        />
+        <button type="submit">Deposit to wallet</button>
+        <button type="button">Redeem sweeps cash</button>
+      </form>
+    </section>
+  </body>
+</html>

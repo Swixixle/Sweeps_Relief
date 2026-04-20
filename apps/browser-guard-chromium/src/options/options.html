@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Sweeps Relief Guard — Options</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        max-width: 640px;
+        margin: 24px;
+        line-height: 1.5;
+      }
+      code,
+      pre {
+        background: #f4f4f4;
+        padding: 2px 6px;
+        font-size: 12px;
+      }
+      pre {
+        padding: 10px;
+        overflow: auto;
+        max-height: 280px;
+      }
+      label {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin: 8px 0;
+      }
+      fieldset {
+        border: 1px solid #ccc;
+        margin: 16px 0;
+        padding: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Browser Guard</h1>
+    <p>Rule version: <code id="rule-version">—</code></p>
+    <p>
+      Rules ship from Sweeps_Relief <code>config/</code> at build time. No cloud sync or remote reporting.
+    </p>
+
+    <fieldset>
+      <legend>Behavior</legend>
+      <label>
+        <input type="checkbox" id="block-input" checked />
+        Allow block-input mode when the engine requests it (very high risk + protected data)
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Local debugging</legend>
+      <label>
+        <input type="checkbox" id="debug-mode" />
+        Store last evaluation (scores, terms, action) for inspection below
+      </label>
+      <p id="debug-meta" style="font-size: 12px; color: #555"></p>
+      <pre id="debug-panel">(enable debug and trigger a paste or keypress on a guarded page)</pre>
+    </fieldset>
+
+    <p>
+      <button type="button" id="export">Export receipts JSON</button>
+    </p>
+    <script type="module" src="options.js"></script>
+  </body>
+</html>

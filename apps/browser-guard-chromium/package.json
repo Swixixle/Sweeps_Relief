@@ -1,0 +1,23 @@
+{
+  "name": "@sweeps-relief/browser-guard-chromium",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs && node scripts/compile-harness.mjs",
+    "test": "vitest run",
+    "harness": "node scripts/manual-harness.bundle.mjs",
+    "lint": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@sweeps-relief/browser-guard-core": "0.1.0",
+    "@sweeps-relief/shared-receipts": "0.1.0",
+    "@sweeps-relief/shared-risk-engine": "0.1.0"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.287",
+    "esbuild": "^0.24.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}
