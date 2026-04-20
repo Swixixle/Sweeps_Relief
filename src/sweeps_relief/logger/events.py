@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import base64
+import binascii
+import logging
 import uuid
 from datetime import datetime, timezone
 from enum import Enum
@@ -15,6 +17,8 @@ from sweeps_relief.core.canonical_json import canonicalize_json
 from sweeps_relief.core.chain import chain_event
 from sweeps_relief.core.hashing import hash_hex
 from sweeps_relief.signer.ed25519 import sign_bytes, verify_bytes
+
+logger = logging.getLogger(__name__)
 
 
 class EventType(str, Enum):
@@ -116,8 +120,17 @@ def verify_log_bundle(bundle: LogBundle, public_key: Ed25519PublicKey) -> bool:
         "events_hash": bundle.events_hash,
     }
     to_sign = canonicalize_json(payload)
+    # Distinguish expected integrity failures (return False) from unexpected bugs (logged at error level)
     try:
         sig = base64.b64decode(bundle.signature_b64, validate=True)
+    except (binascii.Error, ValueError, TypeError) as e:
+        logger.warning(
+            "invalid log bundle signature_b64 (decode failed): %s: %s",
+            type(e).__name__,
+            e,
+        )
+        return False
     except Exception:
+        logger.exception("unexpected error in verify_log_bundle")
         return False
     return verify_bytes(public_key, to_sign, sig)
