@@ -3,12 +3,25 @@
 from __future__ import annotations
 
 import base64
+import hashlib
 import json
+import logging
 from pathlib import Path
 from typing import Any
 
+from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey, Ed25519PublicKey
+
+logger = logging.getLogger(__name__)
+
+
+def _public_key_fingerprint(public_key: Ed25519PublicKey) -> str:
+    raw = public_key.public_bytes(
+        encoding=serialization.Encoding.Raw,
+        format=serialization.PublicFormat.Raw,
+    )
+    return hashlib.sha256(raw).hexdigest()[:12]
 
 
 def generate_keypair() -> tuple[Ed25519PrivateKey, Ed25519PublicKey]:
@@ -58,5 +71,19 @@ def verify_bytes(public_key: Ed25519PublicKey, message: bytes, signature: bytes)
     try:
         public_key.verify(signature, message)
         return True
+    except InvalidSignature:
+        logger.debug(
+            "signature verification failed for key %s",
+            _public_key_fingerprint(public_key),
+        )
+        return False
+    except (ValueError, TypeError) as e:
+        logger.warning(
+            "malformed input to verify_bytes: %s: %s",
+            type(e).__name__,
+            e,
+        )
+        return False
     except Exception:
+        logger.exception("unexpected error in verify_bytes")
         return False
