@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import base64
+import binascii
+import logging
 from typing import Any
 
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey, Ed25519PublicKey
@@ -11,6 +13,8 @@ from sweeps_relief.core.canonical_json import canonicalize_json
 from sweeps_relief.core.hashing import hash_hex
 from sweeps_relief.policy.models import PolicyArtifact, PolicyContent
 from sweeps_relief.signer.ed25519 import sign_bytes, verify_bytes
+
+logger = logging.getLogger(__name__)
 
 
 def policy_body_for_signing(content: PolicyContent) -> bytes:
@@ -41,7 +45,15 @@ def verify_policy_artifact(artifact: PolicyArtifact, public_key: Ed25519PublicKe
         return False
     try:
         sig = base64.b64decode(artifact.signature_b64, validate=True)
+    except (binascii.Error, ValueError, TypeError) as e:
+        logger.warning(
+            "invalid policy artifact signature_b64 (decode failed): %s: %s",
+            type(e).__name__,
+            e,
+        )
+        return False
     except Exception:
+        logger.exception("unexpected error decoding policy signature")
         return False
     return verify_bytes(public_key, body, sig)
 
