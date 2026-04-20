@@ -31,6 +31,12 @@ keys/
 .env
 .env.*
 
+# JavaScript / browser guard
+node_modules/
+apps/browser-guard-chromium/dist/
+apps/browser-guard-chromium/scripts/manual-harness.bundle.mjs
+apps/browser-guard-chromium/scripts/manual-harness.bundle.mjs.map
+
 # IDE
 .idea/
 .vscode/
