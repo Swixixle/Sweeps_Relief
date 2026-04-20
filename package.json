@@ -1,0 +1,17 @@
+{
+  "name": "sweeps-relief-workspace",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build:js": "npm run build --workspaces --if-present",
+    "test:js": "npm test --workspaces --if-present",
+    "test": "npm run test:js && python -m pytest",
+    "build": "npm run build:js"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  }
+}
