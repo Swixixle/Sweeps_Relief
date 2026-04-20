@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "Sweeps Relief Browser Guard (Safari)",
+  "version": "0.1.0",
+  "description": "Placeholder — wire Xcode Safari Web Extension target to shared JS bundle from browser-guard-chromium build output.",
+  "permissions": ["storage"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "Sweeps Relief Guard",
+    "default_popup": "popup.html"
+  },
+  "options_page": "options.html",
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ]
+}
