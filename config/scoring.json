@@ -1,0 +1,80 @@
+{
+  "rule_version": "1.2.0",
+  "thresholds": {
+    "warn_only_min": 12,
+    "high_page": 38,
+    "high_field": 32,
+    "very_high_page": 62,
+    "very_high_field": 52,
+    "redact_page": 78,
+    "redact_field": 72
+  },
+  "weights": {
+    "domain_match": 48,
+    "page_term_hit": 6,
+    "page_term_cap": 42,
+    "field_term_hit": 9,
+    "field_term_cap": 40,
+    "field_sensitive_bonus": 12
+  },
+  "sensitive_field_substrings": [
+    "password",
+    "ssn",
+    "card",
+    "cvv",
+    "cvc",
+    "routing",
+    "account"
+  ],
+  "combo_risk": {
+    "pairs": [
+      ["register", "sweeps"],
+      ["register", "sweepstakes"],
+      ["sign up", "bonus"],
+      ["redeem", "coins"],
+      ["redeem", "cash"],
+      ["login", "cashier"],
+      ["verify identity", "redeem"],
+      ["deposit", "bonus"],
+      ["wallet", "deposit"],
+      ["kyc", "verify"],
+      ["first name", "last name"],
+      ["phone", "verify"],
+      ["log in", "wallet"],
+      ["sign in", "bonus"]
+    ],
+    "weight_per_pair": 12,
+    "max_combo_bonus": 36
+  },
+  "field_boost_terms": [
+    { "match": "email", "weight": 4 },
+    { "match": "password", "weight": 8 },
+    { "match": "phone", "weight": 5 },
+    { "match": "address", "weight": 5 },
+    { "match": "billing", "weight": 8 },
+    { "match": "card", "weight": 10 },
+    { "match": "cvv", "weight": 12 },
+    { "match": "wallet", "weight": 10 },
+    { "match": "cashier", "weight": 10 },
+    { "match": "redeem", "weight": 8 },
+    { "match": "verify", "weight": 7 },
+    { "match": "identity", "weight": 8 },
+    { "match": "kyc", "weight": 12 },
+    { "match": "deposit", "weight": 9 },
+    { "match": "dob", "weight": 6 },
+    { "match": "ssn", "weight": 11 }
+  ],
+  "field_boost_cap": 36,
+  "block_input_policy": {
+    "enabled": true
+  },
+  "submit_interception": {
+    "enabled": true,
+    "warn_min_score": 20,
+    "warn_min_page": 15,
+    "warn_min_field": 15,
+    "block_submit_min_score": 45,
+    "min_page_for_block": 30,
+    "min_field_for_block": 30
+  }
+}

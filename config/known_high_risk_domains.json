@@ -1,0 +1,10 @@
+{
+  "version": "1",
+  "hostnames": [
+    "example-sweeps-risk.local"
+  ],
+  "hostname_suffixes": [
+    ".sweepstakes.example"
+  ],
+  "notes": "Editable when Intel reviews land; keep hostnames lowercase."
+}

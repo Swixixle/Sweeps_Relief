@@ -1,0 +1,12 @@
+{
+  "version": "1",
+  "patterns": {
+    "email": "(?:^|[\\s])([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,})(?:$|[\\s])",
+    "phone": "(?:\\+?1[-.\\s]?)?\\(?[0-9]{3}\\)?[-.\\s]?[0-9]{3}[-.\\s]?[0-9]{4}",
+    "full_name": "\\b(?:[A-Z][a-z]+(?:\\s+[A-Z][a-z]+)+)\\b",
+    "address": "\\b\\d{1,5}\\s+\\w+\\s+(?:st|street|ave|avenue|rd|road|blvd|drive|ln|lane)\\b",
+    "dob": "\\b(?:0?[1-9]|1[0-2])[/-](?:0?[1-9]|[12][0-9]|3[01])[/-](?:19|20)?\\d{2}\\b",
+    "card_adjacent": "\\b(?:\\d{4}[-\\s]?){3}\\d{4}\\b"
+  },
+  "notes": "Regexes are examples; tune for locale and false-positive tolerance."
+}
