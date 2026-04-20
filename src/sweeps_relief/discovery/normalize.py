@@ -2,8 +2,13 @@
 
 from __future__ import annotations
 
+import logging
 import re
 from urllib.parse import urlparse
+
+logger = logging.getLogger(__name__)
+
+_SNIP = 200
 
 
 def normalize_domain(raw: str) -> str | None:
@@ -20,7 +25,14 @@ def normalize_domain(raw: str) -> str | None:
         try:
             p = urlparse(s)
             host = (p.hostname or "").lower()
-        except Exception:
+        except (ValueError, AttributeError, TypeError) as e:
+            snippet = s if len(s) <= _SNIP else s[:_SNIP] + "…"
+            logger.debug(
+                "could not normalize input: %s (%s: %s)",
+                snippet,
+                type(e).__name__,
+                e,
+            )
             return None
     else:
         host = s.lower().split("/")[0].split(":")[0]
