@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-04-21T00:00:00Z",
+  "updated_at": "2026-04-21T05:50:00Z",
   "keys": [
     {
       "key_id": "intel-snapshot-key-v1",
       "algorithm": "ed25519",
-      "public_key_pem": "-----BEGIN PUBLIC KEY-----\nPLACEHOLDER_REPLACE_WITH_REAL_INTEL_SNAPSHOT_PUBLIC_KEY\n-----END PUBLIC KEY-----\n",
-      "issued_at": "2026-04-21T00:00:00Z",
+      "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAP/9Auoa7TfXRsPx82Y8ByrDCZphXF2VpLYCglzFUg4A=\n-----END PUBLIC KEY-----\n",
+      "issued_at": "2026-04-21T05:44:00Z",
       "authorized_for": ["intel_snapshot"],
       "revoked_at": null,
       "revocation_reason": null
@@ -14,8 +14,8 @@
     {
       "key_id": "intel-blocklist-key-v1",
       "algorithm": "ed25519",
-      "public_key_pem": "-----BEGIN PUBLIC KEY-----\nPLACEHOLDER_REPLACE_WITH_REAL_INTEL_BLOCKLIST_PUBLIC_KEY\n-----END PUBLIC KEY-----\n",
-      "issued_at": "2026-04-21T00:00:00Z",
+      "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAVniI9O/rs2FiGThi8ab59DbvHFg2nsP4OWItkEjwpgQ=\n-----END PUBLIC KEY-----\n",
+      "issued_at": "2026-04-21T05:44:00Z",
       "authorized_for": ["intel_block_candidates"],
       "revoked_at": null,
       "revocation_reason": null
