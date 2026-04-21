@@ -61,3 +61,7 @@ data/candidates/local/
 # Signed runtime policy artifacts (publish via Releases or another channel; keep policy.content.json tracked)
 data/published/policy.json
 data/published/*.sig
+
+# Handoff directory for Intel-signed artifacts during e2e testing
+# Regenerated on each signing chain test run
+data/intel_handoff/
