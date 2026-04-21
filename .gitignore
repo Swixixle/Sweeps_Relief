@@ -26,7 +26,8 @@ ENV/
 # Keys / secrets (never commit)
 *.pem
 *.key
-keys/
+keys/*
+!keys/README.md
 **/secrets/
 .env
 .env.*
